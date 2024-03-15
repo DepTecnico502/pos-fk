@@ -99,9 +99,9 @@
                                 'recepciones.create', 
                                 'recepciones.view',
                                 'recepciones.addarticulo',
-                                'ajustesdeinventario.index', 
-                                'ajustesdeinventario.create', 
-                                'ajustesdeinventario.view',
+                                // 'ajustesdeinventario.index', 
+                                // 'ajustesdeinventario.create', 
+                                // 'ajustesdeinventario.view',
                                 'categoria.index', 
                                 'categoria.create', 
                                 'categoria.editar',
@@ -153,7 +153,7 @@
                                     <div data-i18n="Compras">Pagos</div>
                                 </a>
                             </li>
-                            <li class="menu-item
+                            {{-- <li class="menu-item
                                 {{ request()->routeIs([
                                         'ajustesdeinventario.index', 
                                         'ajustesdeinventario.create', 
@@ -164,7 +164,7 @@
                                 <a href="{{ route('ajustesdeinventario.index') }}" class="menu-link">
                                     <div data-i18n="Container">Ajustes de inventario</div>
                                 </a>
-                            </li>
+                            </li> --}}
                             <li class="menu-item
                                 {{ request()->routeIs([
                                         'categoria.index', 

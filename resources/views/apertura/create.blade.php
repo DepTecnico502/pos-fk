@@ -24,7 +24,7 @@
                         <div class="form-goup row">
                             <div class="form-group col-6">
                                 <label>Saldo inicial</label>
-                                <input name="saldo_inicial" id="saldo_inicial" min="1" required type="number"
+                                <input name="saldo_inicial" id="saldo_inicial" min="0" required type="number"
                                     step="0.01" class="form-control">
                             </div>
                             <div class="col-6">
@@ -32,10 +32,10 @@
                                 <input name="fecha_apertura" required type="date" class="form-control">
                             </div>
                             <div class ="col-6">
-                                <label>Usuario</label>
-                                <select name="user_id" id="user_id" class="form-control">
-                                    @foreach ($usuarios as $usuario)
-                                        <option value="{{ $usuario->id }}">{{ $usuario->name }} : {{ $usuario->caja->caja }}</option>
+                                <label>Caja</label>
+                                <select name="caja_id" id="caja_id" class="form-control">
+                                    @foreach ($cajas as $caja)
+                                        <option value="{{ $caja->id }}">{{ $caja->caja }}</option>
                                     @endforeach
                                 </select>
                             </div>

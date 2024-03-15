@@ -19,34 +19,16 @@ class AperturaCajaController extends Controller
 
     public function create()
     {   
-        $usuarios = User::all();
+        $cajas = Caja::all();
+
         return view('apertura.create', [
-            'usuarios' => $usuarios
+            'cajas' => $cajas
         ]);
-        // $detalleId = AperturaCaja::max('id');
-        // if ($detalleId != null) {
-        //     $apertura = AperturaCaja::findOrFail($detalleId);
-        //     if ($apertura->estado == 'ABIERTO') {
-        //         return redirect()->route('apertura.index')->with([
-        //             'error' => 'ERROR',
-        //             'mensaje' => 'Ya existe una caja abierta.',
-        //             'tipo' => 'alert-danger'
-        //         ]);
-        //     }else{
-        //         return view('apertura.create', [
-        //             'usuarios' => $usuarios
-        //         ]);
-        //     }
-        // }else {
-        //     return view('apertura.create', [
-        //         'usuarios' => $usuarios
-        //     ]);
-        // }
     }
 
     public function store(Request $request)
     {
-        $aperturaCaja = AperturaCaja::where('user_id', $request->user_id)->latest()->first();
+        $aperturaCaja = AperturaCaja::where('caja_id', $request->caja_id)->latest()->first();
         
         if ($aperturaCaja == null || $aperturaCaja->estado === 'CERRADO')
         {
@@ -54,17 +36,15 @@ class AperturaCajaController extends Controller
 
             $apertura->saldo_inicial = $request->saldo_inicial;
             $apertura->fecha_apertura = $request->fecha_apertura;
-            $apertura->user_id = $request->user_id;
+            $apertura->user_id = Auth::user()->id;
+            $apertura->caja_id = $request->caja_id;
             $apertura->save();
-
-            // BUSCO EL USUARIO PARA LUEGO SELECCIONAR SU CAJA CORRESPONDIENTE
-            $user = User::find($apertura->user_id);
 
             $DetalleApertura = new DetalleAperturaCaja();
             $DetalleApertura->descripcion = 'Saldo inicial';
             $DetalleApertura->apertura_cajas_id = $apertura->id;
             $DetalleApertura->saldo_total = $request->saldo_inicial;
-            $DetalleApertura->caja_id = $user->caja_id;
+            $DetalleApertura->caja_id = $request->caja_id;
             $DetalleApertura->save();
 
             return redirect()->route('apertura.index')->with([
@@ -74,44 +54,12 @@ class AperturaCajaController extends Controller
             ]);
         }else
         {
-            return redirect()->route('apertura.index')->with([
+            return redirect()->route('apertura.create')->with([
                 'error' => 'ERROR',
-                'mensaje' => 'Ya existe una apertura de caja con el usuario: ' . $aperturaCaja->user->name,
+                'mensaje' => 'Ya existe una apertura de caja: ' . $aperturaCaja->caja->caja,
                 'tipo' => 'alert-danger'
             ]);
         }
-
-        // if($aperturaCaja->estado === 'ABIERTO')
-        // {
-        //     return redirect()->route('apertura.index')->with([
-        //         'error' => 'ERROR',
-        //         'mensaje' => 'Ya existe una apertura de caja con el usuario: ' . $aperturaCaja->user->name,
-        //         'tipo' => 'alert-danger'
-        //     ]);
-        // }else{
-        //     $apertura = new AperturaCaja();
-
-        //     $apertura->saldo_inicial = $request->saldo_inicial;
-        //     $apertura->fecha_apertura = $request->fecha_apertura;
-        //     $apertura->user_id = $request->user_id;
-        //     $apertura->save();
-
-        //     // BUSCO EL USUARIO PARA LUEGO SELECCIONAR SU CAJA CORRESPONDIENTE
-        //     $user = User::find($apertura->user_id);
-
-        //     $DetalleApertura = new DetalleAperturaCaja();
-        //     $DetalleApertura->descripcion = 'Saldo inicial';
-        //     $DetalleApertura->apertura_cajas_id = $apertura->id;
-        //     $DetalleApertura->saldo_total = $request->saldo_inicial;
-        //     $DetalleApertura->caja_id = $user->caja_id;
-        //     $DetalleApertura->save();
-
-        //     return redirect()->route('apertura.index')->with([
-        //         'error' => 'Exito',
-        //         'mensaje' => 'Apertura creada correctamente',
-        //         'tipo' => 'alert-success'
-        //     ]);
-        // }
     }
 
     public function show($id)
@@ -153,16 +101,10 @@ class AperturaCajaController extends Controller
         $total_arqueo = ($cinco_moneda + $diez_moneda + $veinticinco_moneda + $cincuenta_moneda + $quetzal_moneda) 
             + ($quetzal_billete + $cinco_billete + $diez_billete + $veinte_billete + $cincuenta_billete + $cien_billete + $doscinetos_billete);
 
-        // 
-        $user = User::find($request->user_id);
-        $caja_id = $user->caja_id;
+        $caja_id = $AperturaCaja->caja_id;
 
         // Busqueda para descontar el saldo del usuario correspondiente
         $id = DetalleAperturaCaja::where('caja_id', $caja_id)->latest()->first();
-
-        // $detalleId = DetalleAperturaCaja::max('id');
-        // $id = DetalleAperturaCaja::findOrFail($detalleId);
-
         $saldo = $total_arqueo - $id->saldo_total;
 
         //Guardar datos
@@ -175,8 +117,8 @@ class AperturaCajaController extends Controller
         $AperturaCaja->saldo_inicial = $request->saldo_inicial;
         $AperturaCaja->saldo_total = $id->saldo_total;
         $AperturaCaja->arqueo_caja = $total_arqueo;
-        // $AperturaCaja->user_id = Auth::user()->id;
-        $AperturaCaja->user_id = $request->user_id;
+        $AperturaCaja->user_id = Auth::user()->id;
+        $AperturaCaja->caja_id = $caja_id;
         $AperturaCaja->estado = 'CERRADO';
         $AperturaCaja->fecha_apertura = $request->fecha_apertura;
 

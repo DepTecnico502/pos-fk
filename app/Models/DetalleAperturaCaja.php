@@ -32,4 +32,10 @@ class DetalleAperturaCaja extends Model
     public function Recepcion() {
         return $this->belongsTo(Recepciones::class, 'recepciones_id', 'id');
     }
+
+    public function caja()
+    {
+        // Uno a Uno
+        return $this->belongsTo(Caja::class);
+    }
 }

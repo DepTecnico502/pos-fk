@@ -27,12 +27,20 @@
                                 <input name="descripcion" id="descripcion" required type="text" class="form-control">
                             </div>
                             <div class="col-6">
-                                <label>Entrada</label>
+                                <label>Entrada de efectivo</label>
                                 <input onchange="updateEgreso()" name="ingreso" id="ingreso" type="number" step="0.01" class="form-control">
                             </div>
                             <div class="col-6">
-                                <label>Salida</label>
+                                <label>Salida de efectivo</label>
                                 <input onchange="updateIngreso()" name="egreso" id="egreso" type="number" step="0.01" class="form-control">
+                            </div>
+                            <div class ="col-6">
+                                <label>Caja</label>
+                                <select name="caja_id" id="caja_id" class="form-control">
+                                    @foreach ($aperturas as $apertura)
+                                        <option value="{{ $apertura->caja->id }}">{{ $apertura->caja->caja }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <br>

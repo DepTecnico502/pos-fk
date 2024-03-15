@@ -39,34 +39,15 @@ class VentasController extends Controller
     }
 
     public function create()
-    {   
-        // $detalleId = AperturaCaja::max('id');
-        // if ($detalleId != null) $apertura = AperturaCaja::findOrFail($detalleId);
-        
-        // if ($detalleId == null || $apertura->estado == 'CERRADO') {
-        //     return redirect()->route('ventas.index')->with([
-        //         'error' => 'Error',
-        //         'mensaje' => 'Se debe de aperturar una caja.',
-        //         'tipo' => 'alert-danger'
-        //     ]);
-        
-        $aperturaCaja = AperturaCaja::where('user_id', Auth::user()->id)->latest()->first();
+    {
+        $clientes = Cliente::all();
+        $aperturas = AperturaCaja::where('estado', 'ABIERTO')->get();
 
-        if ($aperturaCaja == null || $aperturaCaja->estado == 'CERRADO') {
-            return redirect()->route('ventas.index')->with([
-                'error' => 'Error',
-                'mensaje' => 'Se debe de aperturar una caja para el usuario: '.Auth::user()->name,
-                'tipo' => 'alert-danger'
-            ]);
-        }else{
-            $clientes = Cliente::all();
-            // $tipo_documento = tipo_documento::all();
-            $idsBusqueda = [33, 41, 99];
-            $tipo_documento = tipo_documento::whereIn('id', $idsBusqueda)->get();
-            $articulos = Articulo::all()->where('stock', '>', 0)->where('estado', '=', 1);
-            $medios_pago = mediosdepago::all();
-            return view('ventas.create', compact(['clientes', 'articulos', 'tipo_documento', 'medios_pago']));
-        }
+        $idsBusqueda = [33, 41, 99];
+        $tipo_documento = tipo_documento::whereIn('id', $idsBusqueda)->get();
+        $articulos = Articulo::all()->where('stock', '>', 0)->where('estado', '=', 1);
+        $medios_pago = mediosdepago::all();
+        return view('ventas.create', compact(['clientes', 'articulos', 'tipo_documento', 'medios_pago','aperturas']));
     }
 
     public function addArticulo(Request $request)
@@ -134,12 +115,14 @@ class VentasController extends Controller
         }
 
         $clientes = Cliente::all();
+        $aperturas = AperturaCaja::where('estado', 'ABIERTO')->get();
+
         $articulos = Articulo::all()->where('stock', '>', 0)->where('estado', '=', 1);
         $idsBusqueda = [33, 41, 99];
         $tipo_documento = tipo_documento::whereIn('id', $idsBusqueda)->get();
         $medios_pago = mediosdepago::all();
 
-        return view('ventas.create', compact(['clientes', 'articulos', 'tipo_documento', 'medios_pago']));
+        return view('ventas.create', compact(['clientes', 'articulos', 'tipo_documento', 'medios_pago', 'aperturas']));
     }
 
     public function store(Request $request)
@@ -219,40 +202,39 @@ class VentasController extends Controller
                 $tipo_documento->save();
             }
 
-            //Guardar reporte de caja
-            // $aperturaId = AperturaCaja::max('id');
             $aperturaCaja = AperturaCaja::where('user_id', Auth::user()->id)->latest()->first();
             $aperturaId = $aperturaCaja->id;
 
             $ventaId = Ventas::max('id');
 
             $DetalleApertura = new DetalleAperturaCaja();
-            
-            // $detalleId = DetalleAperturaCaja::max('id');
-            // $saldo = DetalleAperturaCaja::findOrFail($detalleId);
-
-            // Buscar usuario para almacenar su caja correspondiente
-            $user = User::find(Auth::user()->id);
-            $caja_id = $user->caja_id;
 
             // Busqueda para descontar el saldo del usuario correspondiente
             if($request->tipo_documento != 41){
-                $saldo = DetalleAperturaCaja::where('caja_id', $caja_id)->latest()->first();
+                $saldo = DetalleAperturaCaja::where('caja_id', $request->caja_id)->latest()->first();
     
                 $DetalleApertura->descripcion = 'Venta';
                 $DetalleApertura->apertura_cajas_id = $aperturaId;
                 $DetalleApertura->venta_id = $ventaId;
                 $DetalleApertura->saldo_total = ($saldo->saldo_total + $request->monto_total);
-                $DetalleApertura->caja_id = $caja_id;
+                $DetalleApertura->caja_id = $request->caja_id;
                 $DetalleApertura->save();
-            }
 
-            return redirect()->route('ventas.index')->with([
-                'error' => 'Exito',
-                'mensaje' => 'Venta registrada correctamente',
-                'tipo' => 'alert-success',
-                'open_second_page' => route('ticket.venta', $venta->id)
-            ]);
+                return redirect()->route('ventas.index')->with([
+                    'error' => 'Exito',
+                    'mensaje' => 'Venta registrada correctamente',
+                    'tipo' => 'alert-success',
+                    'open_second_page' => route('ticket.venta', $venta->id)
+                ]);
+            }else{
+                return redirect()->route('ventas.index')->with([
+                    'error' => 'Exito',
+                    'mensaje' => 'Venta registrada correctamente',
+                    'tipo' => 'alert-success',
+                    'open_second_page' => route('pdf.venta', $venta->id)
+                ]);
+            }
+            
         }
     }
 
@@ -281,31 +263,10 @@ class VentasController extends Controller
     public function anularFactura(Ventas $venta)
     {
         $venta_detalles = DetalleVentas::where('venta_id', $venta->id)->get();
+        $apertura = DetalleAperturaCaja::where('venta_id', $venta->id)->latest()->first();
 
-        // $apertura_cajas_id = AperturaCaja::max('id');
-        // $saldo_actual = DetalleAperturaCaja::where('venta_id', $venta->id)->first();
-        
-        //
-        $user = User::find($venta->user_id);
-        $caja_id = $user->caja_id;
+        $saldo_total = $apertura->saldo_total - $venta->monto_total;
 
-        // Busqueda para descontar el saldo del usuario correspondiente
-        $saldo_actual = DetalleAperturaCaja::where('caja_id', $caja_id)->latest()->first();
-        $apertura_caja = AperturaCaja::where('user_id', $venta->user_id)->latest()->first();
-        $apertura_cajas_id = $apertura_caja->id;
-
-        // Actualiza apertura de caja
-        $saldo_total = $saldo_actual->saldo_total - $venta->monto_total;
-        // dd($saldo_total);
-
-        DetalleAperturaCaja::create([
-            'descripcion' => 'Factura Anulada',
-            'egreso' => $venta->monto_total,
-            'apertura_cajas_id' => $apertura_cajas_id,
-            'saldo_total' => $saldo_total,
-            'caja_id' => $caja_id,
-        ]);
-        
         if ($venta->estado === 1) {
 
             $venta->update(['estado' => 0]); // 1=Factura, 0=Anulado
@@ -321,6 +282,15 @@ class VentasController extends Controller
                 $producto->update(['stock' => $nuevo_stock]);
             }
 
+            // Crear el movimiento
+            DetalleAperturaCaja::create([
+                'descripcion' => 'Factura Anulada',
+                'egreso' => $venta->monto_total,
+                'apertura_cajas_id' => $apertura->apertura_cajas_id,
+                'saldo_total' => $saldo_total,
+                'caja_id' => $apertura->caja_id,
+            ]);
+            
             return redirect()->back()->with([
                 'error' => 'Exito',
                 'mensaje' => 'La factura se anulo correctamente.',

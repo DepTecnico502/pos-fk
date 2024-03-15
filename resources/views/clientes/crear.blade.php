@@ -27,11 +27,11 @@
 
                     <div class="mb-3">
                         <label>Correo</label>
-                        <input name="email" required type="email" class="form-control">
+                        <input name="email" type="email" class="form-control">
                     </div>
                     <div class="mb-3">
                         <label>Teléfono</label>
-                        <input name="telefono" type="number" class="form-control" required>
+                        <input name="telefono" type="number" class="form-control">
                     </div>
 
                     <button type="button" class="btn btn-primary rounded-pill block" data-bs-toggle="modal"

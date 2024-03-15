@@ -3,45 +3,49 @@
 namespace App\Http\Controllers;
 
 use App\Models\AperturaCaja;
+use App\Models\Caja;
 use App\Models\DetalleAperturaCaja;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DetalleAperturaCajaController extends Controller
 {
     public function index()
-    {   
-        // $detalleApertura = DetalleAperturaCaja::whereHas('Apertura', function ($query) {
-        //     $query->where('estado', 'ABIERTO');
-        // })->get();
+    {
+        // Consulta para solo mostrar las cajas aperturadas
+        $aperturas = AperturaCaja::where('estado', 'ABIERTO')->get();
 
-        $detalleApertura = DetalleAperturaCaja::whereHas('Apertura', function ($query) {
-            $query->where('estado', 'ABIERTO');
-        })->where('caja_id', Auth::user()->caja_id)->get();
-        
-        
-        return view('movimientos.index', compact('detalleApertura'));
+        // Obtener solo los IDs de las cajas aperturadas
+        $cajasAperturadasIds = $aperturas->pluck('id');
+
+        // Consulta para obtener los detalles de apertura de cajas para las cajas aperturadas
+        $detalleApertura = DetalleAperturaCaja::whereIn('apertura_cajas_id', $cajasAperturadasIds)
+        ->whereIn('id', function ($query) {
+            $query->select(DB::raw('MAX(id)'))
+                ->from('detalle_apertura_cajas')
+                ->groupBy('apertura_cajas_id');
+        })
+        ->get();
+
+        // dd($detalleApertura);
+        return view('movimientos.index', [
+            'detalleApertura' => $detalleApertura,
+        ]);
     }
 
+    // $detalleApertura = DetalleAperturaCaja::whereHas('Apertura', function ($query) {
+    //     $query->where('estado', 'ABIERTO');
+    // })->get();
     public function create()
     {   
-        // $detalleId = AperturaCaja::max('id');
-        // if ($detalleId != null) $apertura = AperturaCaja::findOrFail($detalleId);
+        // Consulta para solo mostrar las cajas aperturadas
+        $aperturas = AperturaCaja::where('estado', 'ABIERTO')->get();
 
-        $aperturaCaja = AperturaCaja::where('user_id', Auth::user()->id)->latest()->first();
-
-        // if ($detalleId == null || $apertura->estado == 'CERRADO') {
-        if ($aperturaCaja == null || $aperturaCaja->estado == 'CERRADO') {
-            return redirect()->route('movimientos.index')->with([
-                'error' => 'Error',
-                'mensaje' => 'Se debe de aperturar una caja para el usuario: '.Auth::user()->name,
-                'tipo' => 'alert-danger'
-            ]);
-        }else{
-            $detalleApertura = DetalleAperturaCaja::all();
-            return view('movimientos.create', compact('detalleApertura'));
-        }
+        return view('movimientos.create', [
+            'aperturas' => $aperturas
+        ]);
     }
 
     public function store(Request $request)
@@ -54,25 +58,16 @@ class DetalleAperturaCajaController extends Controller
             ]);
         } else {
             $DetalleApertura = new DetalleAperturaCaja();
-            // $aperturaId = AperturaCaja::max('id');
-            $aperturaCaja = AperturaCaja::where('user_id', Auth::user()->id)->latest()->first();
+            $aperturaCaja = AperturaCaja::where('caja_id', $request->caja_id)->latest()->first();
             $aperturaId = $aperturaCaja->id;
-
-            // Buscar usuario para almacenar su caja correspondiente
-            $user = User::find(Auth::user()->id);
-            $caja_id = $user->caja_id;
             
             $DetalleApertura->descripcion = $request->descripcion;
             $DetalleApertura->ingreso = $request->ingreso;
             $DetalleApertura->egreso = $request->egreso;
             $DetalleApertura->apertura_cajas_id = $aperturaId;
-            $DetalleApertura->caja_id = $caja_id;
+            $DetalleApertura->caja_id = $request->caja_id;
 
-            //Agregar saldo_total
-            // $detalleId = DetalleAperturaCaja::max('id');
-            // $id = DetalleAperturaCaja::findOrFail($detalleId);
-            // Busqueda para descontar el saldo del usuario correspondiente
-            $saldo = DetalleAperturaCaja::where('caja_id', $caja_id)->latest()->first();
+            $saldo = DetalleAperturaCaja::where('caja_id', $request->caja_id)->latest()->first();
 
             if($request->ingreso != null){
                 $sum = $saldo->saldo_total + $request->ingreso;

@@ -33,7 +33,8 @@
             <table id="example" class="table table-hover table-borderless" cellspacing="0" width="100%">
                 <thead class="table-dark">
                     <tr>
-                        <td>ID</td>
+                        <td>Caja</td>
+                        <td>Saldo total</td>
                         <td>Descripcion</td>
                         <td>Saldo</td>
                         <td>Entrada</td>
@@ -45,7 +46,8 @@
                 <tbody>
                     @foreach ($detalleApertura as $u)
                         <tr>
-                            <td>{{ $u->id }}</td>
+                            <td>{{ $u->caja->caja }}</td>
+                            <td>{{ $u->saldo_total }}</td>
                             <td>
                                 {{ $u->descripcion }}
                             </td>

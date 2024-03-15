@@ -36,9 +36,8 @@
             <table id="example" class="table table-hover table-borderless" cellspacing="0" width="100%">
                 <thead class="table-dark">
                     <tr>
-                        <td>ID</td>
                         <td>Fecha de apertura</td>
-                        <td>Usuario</td>
+                        <td>Caja</td>
                         <td>Saldo inicial</td>
                         <td>Saldo total</td>
                         <td>Arqueo de caja</td>
@@ -51,9 +50,8 @@
                 <tbody>
                     @foreach ($apertura as $u)
                         <tr>
-                            <td>{{ $u->id }}</td>
                             <td>{{ $u->fecha_apertura }}</td>
-                            <td>{{ $u->User->name }}</td>
+                            <td>{{ $u->caja->caja }}</td>
                             <td>
                                 Q {{ $u->saldo_inicial }}
                             </td>

@@ -115,6 +115,17 @@
                                                 <form role="form" action="{{ route('ventas.store') }}" method="POST">
                                                     @csrf
                                                     <div class="mb-3">
+                                                        <label>Caja</label>
+                                                        <select id="caja_id" required name="caja_id"
+                                                            class="form-control select2">
+                                                            <option value="">Seleccionar</option>
+                                                            @foreach ($aperturas as $apertura)
+                                                                <option value="{{ $apertura->caja->id }}">{{ $apertura->caja->caja }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
                                                         <label>Medio de pago</label>
                                                         <select id="medio_de_pago" required name="medio_de_pago"
                                                             class="form-control select2">

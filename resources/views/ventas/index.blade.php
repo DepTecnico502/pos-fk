@@ -102,7 +102,7 @@
                                         <i class="fa-solid fa-print"></i>
                                     </a>
                                     <a 
-                                        class="btn btn-warning"
+                                        class="{{ $v->TipoDocumento->id === 41 ? 'btn btn-warning' : 'btn btn-warning disabled' }}"
                                         target="_blank"
                                         type="button"
                                         href="{{ route('pdf.venta', $v->id) }}">

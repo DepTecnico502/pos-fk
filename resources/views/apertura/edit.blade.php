@@ -72,7 +72,6 @@
                 </div>
                     <input type="text" name="saldo_inicial"  value="{{$apertura->saldo_inicial}}" hidden>
                     <input type="text" name="fecha_apertura"  value="{{$apertura->fecha_apertura}}" hidden>
-                    <input type="text" name="user_id"  value="{{$apertura->user_id}}" hidden>
                 <br>
                 <button type="button" class="btn btn-primary rounded-pill block" data-bs-toggle="modal"
                     data-bs-target="#exampleModalCenter">
