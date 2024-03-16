@@ -7,6 +7,7 @@ use App\Models\CategoriaProducto;
 use App\Models\Proveedor;
 use App\Models\tipo_documento;
 use App\Models\DetalleMovimientosArticulos;
+use App\Models\Serie;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
@@ -23,14 +24,27 @@ class ArticulosController extends Controller
     public function create()
     {
         $categorias = CategoriaProducto::all();
-
-        return view('articulos.crear', compact('categorias'));
+        $series = Serie::all();
+        
+        return view('articulos.crear', [
+            'categorias' => $categorias,
+            'series' => $series
+        ]);
     }
 
     public function store(Request $request)
     {
+        $serie = Serie::where('id', $request->serie_id)->first();
+        $sequence = $serie->secuencia + 1;
+
+        $codigo_interno = $serie->serie . str_pad($sequence , 5, '0', STR_PAD_LEFT);
+
+        // dd($sequence);
+
         $articulo = new Articulo();
-        $articulo->cod_interno = $request->cod_interno;
+        // $articulo->cod_interno = $request->cod_interno;
+        $articulo->serie_id = $request->serie_id;
+        $articulo->cod_interno = $codigo_interno;
         $articulo->descripcion = $request->descripcion;
         $articulo->id_categoria = $request->id_categoria;
         $articulo->precio_venta = $request->precio_venta;
@@ -45,8 +59,13 @@ class ArticulosController extends Controller
         }
         $articulo->estado = $request->estado;
 
+        // Actualizar secuencia se las series
+        $serie_update = Serie::find($request->serie_id);
+        $serie_update->secuencia = $sequence;
+
         try {
             $articulo->save();
+            $serie_update->save();
             if (session('recepcion')) {
                 $proveedores = Proveedor::all();
                 $articulos = Articulo::all();
@@ -54,13 +73,13 @@ class ArticulosController extends Controller
 
                 return view('recepciones.create', compact(['proveedores', 'articulos', 'tipo_documento']))->with([
                     'error' => 'Exito',
-                    'mensaje' => 'Artículo creado correctamente',
+                    'mensaje' => 'Artículo '. $articulo->cod_interno. ' creado correctamente',
                     'tipo' => 'alert-success'
                 ]);
             }
             return redirect()->route('articulos.index')->with([
                 'error' => 'Exito',
-                'mensaje' => 'Artículo creado correctamente',
+                'mensaje' => 'Artículo '. $articulo->cod_interno. ' creado correctamente',
                 'tipo' => 'alert-success'
             ]);
         } catch (\Exception $e) {

@@ -14,6 +14,7 @@ use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ProveedoresController;
 use App\Http\Controllers\RecepcionesController;
 use App\Http\Controllers\ReporteVentasController;
+use App\Http\Controllers\SerieController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UsuariosController;
@@ -151,6 +152,13 @@ Route::get('/caja/{id}/editar', [CajaController::class,'edit'])->middleware('aut
 Route::put('/caja/{id}/actualizar', [CajaController::class, 'update'])->middleware('auth.conta')->name('caja.update');
 Route::get('/caja/crear', [CajaController::class,'create'])->middleware('auth.conta')->name('caja.crear');
 Route::post('/caja/crear', [CajaController::class,'store'])->middleware('auth.conta')->name('caja.store');
+
+// Series
+Route::get('/configuracion/series', [SerieController::class, 'index'])->middleware('auth.admin')->name('configuracion.series.index');
+Route::get('/configuracion/series/{id}/editar', [SerieController::class, 'edit'])->middleware('auth.admin')->name('configuracion.series.edit');
+Route::put('/configuracion/series/{serie}', [SerieController::class, 'update'])->middleware('auth.admin')->name('configuracion.series.update');
+Route::get('/configuracion/series/crear', [SerieController::class, 'create'])->middleware('auth.admin')->name('configuracion.series.create');
+Route::post('/configuracion/series/crear', [SerieController::class, 'store'])->middleware('auth.admin')->name('configuracion.series.store');
 
 //ERROR 403
 Route::get('/denied', function () {

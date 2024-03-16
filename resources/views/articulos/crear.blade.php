@@ -22,9 +22,17 @@
                     @csrf
                     <div class="mb-3 row">
                         <div class="col-6">
+                            <label>Serie</label>
+                            <select id="serie_id" name="serie_id" class="form-control">
+                                @foreach ($series as $serie)
+                                    <option value="{{ $serie->id }}">{{ $serie->serie }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        {{-- <div class="col-6">
                             <label>Código</label>
                         <input name="cod_interno" required type="text" class="form-control">
-                        </div>
+                        </div> --}}
                         <div class="col-6">
                             <label>Stock</label>
                             <input name="stock" type="number" class="form-control">

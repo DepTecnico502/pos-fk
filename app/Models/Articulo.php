@@ -11,6 +11,7 @@ class Articulo extends Model
 
     protected $fillable =[
         'id',
+        'serie_id',
         'cod_interno',
         'cod_barras',
         'descripcion',
@@ -25,5 +26,11 @@ class Articulo extends Model
 
     public function Categoria(){
         return $this->hasOne(CategoriaProducto::class, 'id', 'id_categoria');
+    }
+
+    public function serie()
+    {
+        // Uno a Uno
+        return $this->belongsTo(Serie::class);
     }
 }

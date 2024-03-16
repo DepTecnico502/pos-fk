@@ -106,7 +106,7 @@
                                 'categoria.create', 
                                 'categoria.editar',
                                 'pagos.index',
-                                'pagos.create'
+                                'pagos.create',
                             ]) ? 'active open' : ''
                         }}
                     ">
@@ -329,7 +329,10 @@
                                 'configuracion.usuarios.editar',
                                 'configuracion.mediosdepago.index',
                                 'configuracion.mediosdepago.create',
-                                'configuracion.mediosdepago.editar'
+                                'configuracion.mediosdepago.editar',
+                                'configuracion.series.index',
+                                'configuracion.series.edit',
+                                'configuracion.series.create'
                             ]) ? 'active open' : ''
                         }}
                     ">
@@ -361,6 +364,18 @@
                             ">
                                 <a href="{{ route('configuracion.mediosdepago.index') }}" class="menu-link">
                                     <div data-i18n="Medios de pago">Medios de pago</div>
+                                </a>
+                            </li>
+                            <li class="menu-item 
+                                {{ request()->routeIs([
+                                        'configuracion.series.index',
+                                        'configuracion.series.edit',
+                                        'configuracion.series.create'
+                                    ]) ? 'active' : ''
+                                }}
+                            ">
+                                <a href="{{ route('configuracion.series.index') }}" class="menu-link">
+                                    <div data-i18n="Series">Series</div>
                                 </a>
                             </li>
                         </ul>
