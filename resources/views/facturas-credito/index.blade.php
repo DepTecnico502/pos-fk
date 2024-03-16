@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Ventas')
+@section('title', 'Facturas al crédito')
 
 @section('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css">
@@ -14,7 +14,7 @@
 @endsection
 
 @section('page-link')
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Ventas/</span></h4>
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Facturas/</span></h4>
 @endsection
 
 @section('content')
@@ -28,14 +28,6 @@
     </div>
 
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Ventas</h5>
-            <small class="text-muted float-end">
-                <div class="btn-group">
-                    <a type="button" class="btn btn-primary" href="{{ route('ventas.create') }}">Agregar venta</a>
-                </div>
-            </small>
-        </div>
         <div class="card-body">
             <!--Buscar por fecha-->
             <div class="m-0 row justify-content-center">
@@ -52,44 +44,35 @@
                     </div>
                 </div>
             </div>
-            <div class="py-3">
-                <div>
-                    Venta total del día: Q <strong>{{ $venta_total }}</strong>
-                </div>
-                <div>
-                    Monto total de ventas: Q <strong>{{ $monto_venta_total }}</strong>
-                </div>
-            </div>
             <table id="example" class="table table-hover table-borderless" cellspacing="0" width="100%">
                 <thead class="table-dark">
                     <tr>
-                        <td>ID</td>
+                        <td>Fecha emitida</td>
+                        <td>Venta</td>
                         <td>Cliente</td>
-                        <td>Documento</td>
-                        <td>Monto</td>
-                        <td>Medio de pago</td>
-                        <td>Fecha</td>
-                        <td>Condición</td>
-                        <td>Usuario</td>
+                        <td>Días de crédito</td>
+                        <td>Fecha a pagar</td>
+                        <td>Monto Total</td>
+                        <td>Saldo pendiente</td>
+                        <td>Estado</td>
                         <td>Acciones</td>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($ventas as $v)
+                    @foreach ($facturas as $factura)
                         <tr>
-                            <td>{{ $v->id }}</td>
-                            <td>{{ $v->Cliente->nombre }} ({{ $v->Cliente->rut }})</td>
-                            <td>{{ $v->TipoDocumento->tipo_documento }}: {{ $v->documento }}</td>
-                            <td>Q {{ $v->monto_total }}</td>
-                            <td>{{ $v->MedioDePago->medio_de_pago }}</td>
-                            <td>{{ date('Y-m-d', strtotime($v->created_at)) }}</td>
-                            {{-- <td>{{ date('d-m-Y', strtotime($v->created_at)) }}</td> --}}
-                            <td>{{ $v->condicion === 0 ? 'Contado' : 'Crédito' }}</td>
-                            <td>{{ $v->user->name }}</td>
+                            <td>{{ date('Y-m-d', strtotime($factura->created_at)) }}</td>
+                            <td>{{ $factura->venta->TipoDocumento->tipo_documento }}: {{ $factura->venta->documento }}</td>
+                            <td>{{ $factura->cliente->nombre }} ({{ $factura->cliente->rut }})</td>
+                            <td>{{ $factura->dias_credito }}</td>
+                            <td>{{ date('Y-m-d', strtotime($factura->fecha_pagar)) }}</td>
+                            <td>{{ $factura->monto_total }}</td>
+                            <td>{{ $factura->saldo_pendiente }}</td>
+                            <td>{{ $factura->estado }}</td>
                             <td>
                                 <div class="btn-group">
                                     <a type="button" class="btn btn-success"
-                                        href="{{ route('ventas.show', $v->id) }}">
+                                        href="{{ route('ventas.show', $factura->venta_id) }}">
                                         {{-- ver --}}
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
@@ -97,32 +80,15 @@
                                         class="btn btn-primary"
                                         target="_blank"
                                         type="button"
-                                        href="{{ route('ticket.venta', $v->id) }}">
+                                        href="{{ route('ticket.venta', $factura->venta_id) }}">
                                         {{-- Ticket --}}
                                         <i class="fa-solid fa-print"></i>
                                     </a>
-                                    <a 
-                                        class="{{ $v->TipoDocumento->id === 41 ? 'btn btn-warning' : 'btn btn-warning disabled' }}"
-                                        target="_blank"
-                                        type="button"
-                                        href="{{ route('pdf.venta', $v->id) }}">
-                                        {{-- PDF --}}
-                                        <i class="fa-solid fa-file-pdf"></i>
-                                    </a>
-                                    <button 
-                                        class="{{ $v->estado === 1 && $v->TipoDocumento->id !=41 ? 'btn btn-danger' : 'btn btn-danger disabled' }}"
-                                        type="button"
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#modal-anular-{{ $v->id }}"
-                                    >
-                                        {{-- ANULAR FACTURA --}}
-                                        <i class="fa-solid fa-ban"></i>
-                                    </button>
                                 </div>
                             </td>
                         </tr>
                         {{-- Modal --}}
-                        <div class="modal fade" id="modal-anular-{{ $v->id }}" tabindex="-1" role="document"
+                        <div class="modal fade" id="modal-anular-{{ $factura->id }}" tabindex="-1" role="document"
                             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
                                 <div class="modal-content">
@@ -137,7 +103,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                                        <a href="{{ route('venta.anular', $v->id) }}" class="btn btn-primary ml-1">
+                                        <a href="{{ route('venta.anular', $factura->id) }}" class="btn btn-primary ml-1">
                                             <i class="bx bx-check d-block d-sm-none"></i>
                                             <span class="d-none d-sm-block">Anular Factura</span>
                                         </a>
@@ -173,7 +139,7 @@
             function( settings, data, dataIndex ) {
                 var min = minDate.val();
                 var max = maxDate.val();
-                var date = new Date( data[5] );
+                var date = new Date( data[0] );
                 
                 if (
                     ( min === null && max === null ) ||
@@ -197,7 +163,7 @@
 
             var table = $("#example").DataTable({
                 order: [
-                    [0, "desc"]
+                    [1, "desc"]
                 ],
 
                 language: {

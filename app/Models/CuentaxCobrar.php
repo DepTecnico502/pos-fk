@@ -20,4 +20,16 @@ class CuentaxCobrar extends Model
         'saldo_pendiente',
         'estado'
     ];
+
+    public function venta()
+    {
+        // Uno a Uno
+        return $this->belongsTo(Ventas::class);
+    }
+
+    public function cliente()
+    {
+        // Uno a Uno
+        return $this->belongsTo(Cliente::class);
+    }
 }

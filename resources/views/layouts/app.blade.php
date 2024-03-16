@@ -72,7 +72,7 @@
                         </a>
                     </li>
 
-                    <!-- Dashboard -->
+                    <!-- Ventas -->
                     <li class="menu-item 
                         {{ request()->routeIs([
                                 'ventas.index',
@@ -86,6 +86,44 @@
                             <i class="menu-icon fa-solid fa-file-invoice-dollar"></i>
                             <div data-i18n="Analytics">Ventas</div>
                         </a>
+                    </li>
+
+                    {{-- Facturas al credito --}}
+                    <li class="menu-item 
+                        {{ request()->routeIs([
+                                'facturas.credito.index',
+                            ]) ? 'active open' : ''
+                        }}
+                    ">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="menu-icon fa-solid fa-file-invoice"></i>
+                            <div data-i18n="Ajustes">Facturas al crédito</div>
+                        </a>
+
+                        <ul class="menu-sub">
+                            <li class="menu-item 
+                                {{ request()->routeIs([
+                                        'facturas.credito.index',
+                                    ]) ? 'active' : ''
+                                }}
+                            ">
+                                <a href="{{ route('facturas.credito.index') }}" class="menu-link">
+                                    <div data-i18n="Facturas">Facturas</div>
+                                </a>
+                            </li>
+                            <li class="menu-item 
+                                {{ request()->routeIs([
+                                        'configuracion.mediosdepago.index',
+                                        'configuracion.mediosdepago.create',
+                                        'configuracion.mediosdepago.editar'
+                                    ]) ? 'active' : ''
+                                }}
+                            ">
+                                <a href="{{ route('configuracion.mediosdepago.index') }}" class="menu-link">
+                                    <div data-i18n="Pagos">Pagos</div>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
 
                     <!-- Inventario -->

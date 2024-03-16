@@ -6,6 +6,7 @@ use App\Http\Controllers\ArticulosController;
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\CategoriaProductoController;
 use App\Http\Controllers\ClientesController;
+use App\Http\Controllers\CuentaXCobrarController;
 use App\Http\Controllers\DetalleAperturaCajaController;
 use App\Http\Controllers\ExportExcelController;
 use App\Http\Controllers\mediosdepagoController;
@@ -159,6 +160,9 @@ Route::get('/configuracion/series/{id}/editar', [SerieController::class, 'edit']
 Route::put('/configuracion/series/{serie}', [SerieController::class, 'update'])->middleware('auth.admin')->name('configuracion.series.update');
 Route::get('/configuracion/series/crear', [SerieController::class, 'create'])->middleware('auth.admin')->name('configuracion.series.create');
 Route::post('/configuracion/series/crear', [SerieController::class, 'store'])->middleware('auth.admin')->name('configuracion.series.store');
+
+// Facturas al credito
+Route::get('/facturas-credito', [CuentaXCobrarController::class, 'index'])->middleware('auth.conta')->name('facturas.credito.index');
 
 //ERROR 403
 Route::get('/denied', function () {

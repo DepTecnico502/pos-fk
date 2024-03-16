@@ -16,4 +16,9 @@ class Cliente extends Model
         'telefono',
         'mail'
     ];
+
+    public function credito()
+    {
+        return $this->hasMany(CuentaxCobrar::class);
+    }
 }

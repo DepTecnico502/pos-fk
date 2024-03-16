@@ -12,6 +12,7 @@ use App\Models\Cliente;
 use App\Models\CuentaxCobrar;
 use App\Models\DetalleAperturaCaja;
 use App\Models\DetalleMovimientosArticulos;
+use App\Models\HistorialCXC;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -157,84 +158,107 @@ class VentasController extends Controller
                 $cuenta_x_cobrar->dias_credito =$request->dias_credito;
                 $cuenta_x_cobrar->fecha_pagar =$request->fecha_a_pagar;
                 $cuenta_x_cobrar->monto_total =$request->monto_total;
-                $cuenta_x_cobrar->saldo_pendiente =$request->monto_total;
-                $cuenta_x_cobrar->save();
-            }
-
-            $venta_id = $venta->id;
-            $venta_detalle = session('venta');
-
-            foreach ($venta_detalle as $value) {
-                $detalle = new DetalleVentas();
-
-                $detalle->venta_id = $venta_id;
-                $detalle->producto_id = $value->articulo_id;
-                $detalle->descuento = $value->descuento;
-                $detalle->observacion = $value->observacion;
-                $detalle->precio_venta = $value->precio_venta;
-                $detalle->precio_compra = $value->articulo->precio_compra;
-                $detalle->cantidad = $value->cantidad;
-                
-                $detalle->save();
-
-                $detalleMovimiento = new DetalleMovimientosArticulos();
-                if($request->tipo_documento == 41)
-                {
-                    $detalleMovimiento->movimiento_id = 5; // 5 = Cotizacion
+                // Calcular el saldo pendiente cuando el cliente deja un anticipo
+                if($request->anticipo){
+                    $cuenta_x_cobrar->saldo_pendiente = $request->monto_total - $request->anticipo;
                 }else{
-                    $detalleMovimiento->movimiento_id = 2; // 2 = ventas
+                    $cuenta_x_cobrar->saldo_pendiente = $request->monto_total;
                 }
-                $detalleMovimiento->id_movimiento = $venta_id;
-                $detalleMovimiento->producto_id = $value->articulo_id;
-                $detalleMovimiento->cantidad = $value->cantidad;
-                $detalleMovimiento->usuario_id = Auth::user()->id;
-                $detalleMovimiento->save();
+                $cuenta_x_cobrar->save();
 
-                if($request->tipo_documento != 41)
-                {
-                    $articulo = Articulo::find($value->articulo_id);
-                    $articulo->stock = $articulo->stock - $value->cantidad;
-                    $articulo->save();
+                if($request->anticipo){
+                    $historial_cxc = new HistorialCXC();
+                    $historial_cxc->cxc_id = $cuenta_x_cobrar->id;
+                    $historial_cxc->monto_abonado = $request->anticipo;
+                    $historial_cxc->save();
+
+                    // REGISTRAR MOVIMIENTO CUANDO SE DEJA UN ANTICIPO
+                    $ventaId = Ventas::max('id');
+                    $DetalleApertura = new DetalleAperturaCaja();
+                    $apertura = DetalleAperturaCaja::where('caja_id', $request->caja_id)->latest()->first();
+        
+                    $DetalleApertura->descripcion = 'Anticipo para la factura: #'.$request->numero_documento;
+                    $DetalleApertura->apertura_cajas_id = $apertura->apertura_cajas_id;
+                    $DetalleApertura->venta_id = $ventaId;
+                    // Validar cuando se deja un anticipo para guardar el movimiento como "Anticipo"
+                    $DetalleApertura->saldo_total = ($apertura->saldo_total + $request->monto_total);
+                    $DetalleApertura->caja_id = $request->caja_id;
+                    $DetalleApertura->save();
                 }
+            }
+        }
 
-                $tipo_documento = tipo_documento::find($request->tipo_documento);
-                $tipo_documento->ultima_emision = $request->numero_documento;
-                $tipo_documento->save();
+        $venta_id = $venta->id;
+        $venta_detalle = session('venta');
+
+        foreach ($venta_detalle as $value) {
+            $detalle = new DetalleVentas();
+
+            $detalle->venta_id = $venta_id;
+            $detalle->producto_id = $value->articulo_id;
+            $detalle->descuento = $value->descuento;
+            $detalle->observacion = $value->observacion;
+            $detalle->precio_venta = $value->precio_venta;
+            $detalle->precio_compra = $value->articulo->precio_compra;
+            $detalle->cantidad = $value->cantidad;
+            
+            $detalle->save();
+
+            $detalleMovimiento = new DetalleMovimientosArticulos();
+            if($request->tipo_documento == 41)
+            {
+                $detalleMovimiento->movimiento_id = 5; // 5 = Cotizacion
+            }else{
+                $detalleMovimiento->movimiento_id = 2; // 2 = ventas
+            }
+            $detalleMovimiento->id_movimiento = $venta_id;
+            $detalleMovimiento->producto_id = $value->articulo_id;
+            $detalleMovimiento->cantidad = $value->cantidad;
+            $detalleMovimiento->usuario_id = Auth::user()->id;
+            $detalleMovimiento->save();
+
+            if($request->tipo_documento != 41)
+            {
+                $articulo = Articulo::find($value->articulo_id);
+                $articulo->stock = $articulo->stock - $value->cantidad;
+                $articulo->save();
             }
 
-            $aperturaCaja = AperturaCaja::where('user_id', Auth::user()->id)->latest()->first();
-            $aperturaId = $aperturaCaja->id;
+            $tipo_documento = tipo_documento::find($request->tipo_documento);
+            $tipo_documento->ultima_emision = $request->numero_documento;
+            $tipo_documento->save();
+        }
 
-            $ventaId = Ventas::max('id');
+        $ventaId = Ventas::max('id');
 
-            $DetalleApertura = new DetalleAperturaCaja();
+        $DetalleApertura = new DetalleAperturaCaja();
 
-            // Busqueda para descontar el saldo del usuario correspondiente
-            if($request->tipo_documento != 41){
-                $saldo = DetalleAperturaCaja::where('caja_id', $request->caja_id)->latest()->first();
+        // Busqueda para descontar el saldo del usuario correspondiente
+        if($request->tipo_documento != 41){
+            if($request->condicion == 0){ //contado = 0
+                $apertura = DetalleAperturaCaja::where('caja_id', $request->caja_id)->latest()->first();
     
                 $DetalleApertura->descripcion = 'Venta';
-                $DetalleApertura->apertura_cajas_id = $aperturaId;
+                $DetalleApertura->apertura_cajas_id = $apertura->apertura_cajas_id;
                 $DetalleApertura->venta_id = $ventaId;
-                $DetalleApertura->saldo_total = ($saldo->saldo_total + $request->monto_total);
+                // Validar cuando se deja un anticipo para guardar el movimiento como "Anticipo"
+                $DetalleApertura->saldo_total = ($apertura->saldo_total + $request->monto_total);
                 $DetalleApertura->caja_id = $request->caja_id;
                 $DetalleApertura->save();
-
-                return redirect()->route('ventas.index')->with([
-                    'error' => 'Exito',
-                    'mensaje' => 'Venta registrada correctamente',
-                    'tipo' => 'alert-success',
-                    'open_second_page' => route('ticket.venta', $venta->id)
-                ]);
-            }else{
-                return redirect()->route('ventas.index')->with([
-                    'error' => 'Exito',
-                    'mensaje' => 'Venta registrada correctamente',
-                    'tipo' => 'alert-success',
-                    'open_second_page' => route('pdf.venta', $venta->id)
-                ]);
             }
-            
+            return redirect()->route('ventas.index')->with([
+                'error' => 'Exito',
+                'mensaje' => 'Venta registrada correctamente',
+                'tipo' => 'alert-success',
+                'open_second_page' => route('ticket.venta', $venta->id)
+            ]);
+        }else{
+            return redirect()->route('ventas.index')->with([
+                'error' => 'Exito',
+                'mensaje' => 'Venta registrada correctamente',
+                'tipo' => 'alert-success',
+                'open_second_page' => route('pdf.venta', $venta->id)
+            ]);
         }
     }
 
@@ -265,7 +289,13 @@ class VentasController extends Controller
         $venta_detalles = DetalleVentas::where('venta_id', $venta->id)->get();
         $apertura = DetalleAperturaCaja::where('venta_id', $venta->id)->latest()->first();
 
-        $saldo_total = $apertura->saldo_total - $venta->monto_total;
+        $id_cxc = CuentaxCobrar::where('venta_id', $venta->id)->first();
+
+        if ($id_cxc) {
+            $facturas_credito = $id_cxc;
+            $facturas_credito->estado = 'Factura anulada';
+            $facturas_credito->save();
+        }
 
         if ($venta->estado === 1) {
 
@@ -283,13 +313,16 @@ class VentasController extends Controller
             }
 
             // Crear el movimiento
-            DetalleAperturaCaja::create([
-                'descripcion' => 'Factura Anulada',
-                'egreso' => $venta->monto_total,
-                'apertura_cajas_id' => $apertura->apertura_cajas_id,
-                'saldo_total' => $saldo_total,
-                'caja_id' => $apertura->caja_id,
-            ]);
+            if($venta->condicion === 0){ // Contado = 0
+                $saldo_total = $apertura->saldo_total - $venta->monto_total;
+                DetalleAperturaCaja::create([
+                    'descripcion' => 'Factura Anulada',
+                    'egreso' => $venta->monto_total,
+                    'apertura_cajas_id' => $apertura->apertura_cajas_id,
+                    'saldo_total' => $saldo_total,
+                    'caja_id' => $apertura->caja_id,
+                ]);
+            }
             
             return redirect()->back()->with([
                 'error' => 'Exito',

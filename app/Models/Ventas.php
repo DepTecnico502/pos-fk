@@ -28,4 +28,9 @@ class Ventas extends Model
     public function User() {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    public function credito()
+    {
+        return $this->hasMany(CuentaxCobrar::class);
+    }
 }

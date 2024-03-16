@@ -190,6 +190,10 @@
                                                             class="form-control input-sm">
                                                     </div>
                                                     <div class="mb-3">
+                                                        <label for="anticipo">Anticipo</label>
+                                                        <input id="anticipo" name="anticipo" type="number" step="0.01" min="0.01" class="form-control input-sm">
+                                                    </div>
+                                                    <div class="mb-3">
                                                         <label>Subtotal(Q)</label>
                                                         <input id="monto_total" name="monto_total" readonly
                                                             type="text" class="form-control input-sm"
@@ -534,11 +538,15 @@
         //Obtener el elemento del campo de fecha a pagar
         const fechaAPagarInput = document.getElementById('fecha_a_pagar');
 
+        //Obtener el elemento del campo de anticipo
+        const anticipoInput = document.getElementById('anticipo');
+
         // Función para manejar el cambio en el campo de medio de pago
         function handleMedioPagoChange() {
             // Obtener el label asociado al input
             var labelDiasCredito = document.querySelector('label[for="dias_credito"]');
             var labelFecha = document.querySelector('label[for="fecha_a_pagar"]');
+            var labelAnticipo = document.querySelector('label[for="anticipo"]');
 
             // Verificar el valor seleccionado
             if (medioPagoSelect.value == 0) {
@@ -553,6 +561,12 @@
                 fechaAPagarInput.setAttribute('hidden', 'hidden');
                 labelFecha.setAttribute('hidden', 'hidden');
                 fechaAPagarInput.value = "";
+
+                // Anticipo
+                anticipoInput.setAttribute('readonly', 'readonly');
+                anticipoInput.setAttribute('hidden', 'hidden');
+                labelAnticipo.setAttribute('hidden', 'hidden');
+                anticipoInput.value = "";
             } else {
                 // Eliminar el atributo readonly y hidden para otras opciones
                 diasCreditoInput.removeAttribute('readonly');
@@ -560,6 +574,10 @@
                 labelDiasCredito.removeAttribute('hidden');
                 fechaAPagarInput.removeAttribute('hidden');
                 labelFecha.removeAttribute('hidden');
+                // Anticipo
+                anticipoInput.removeAttribute('readonly');
+                anticipoInput.removeAttribute('hidden');
+                labelAnticipo.removeAttribute('hidden');
             }
         }
 
