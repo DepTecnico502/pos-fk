@@ -39,7 +39,6 @@
                         <td>NOMBRE</td>
                         <td>USUARIO</td>
                         <td>CORREO</td>
-                        <td>CAJA</td>
                         <td>ROL</td>
                         <td>ESTADO</td>
                         <td>ACCIONES</td>
@@ -52,7 +51,6 @@
                             <td>{{$u->name}}</td>
                             <td>{{$u->user}}</td>
                             <td>{{$u->email}}</td>
-                            <td>{{$u->caja->caja}}</td>
                             <td>{{$u->rol->nombre_rol}}</td>
                             <td>
                             @if ($u->active === 1)

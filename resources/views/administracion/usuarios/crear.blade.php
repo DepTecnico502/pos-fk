@@ -34,14 +34,6 @@
                         <input name="user" required type="text" class="form-control">
                     </div>
                     <div class ="mb-3">
-                        <label>Caja</label>
-                        <select name="caja_id" id="caja_id" class="form-control">
-                            @foreach ($cajas as $caja)
-                                <option value="{{ $caja->id }}">{{ $caja->caja }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class ="mb-3">
                         <label>Rol</label>
                         <select name="id_rol" id="id_rol" class="form-control">
                             @foreach ($rol as $r)

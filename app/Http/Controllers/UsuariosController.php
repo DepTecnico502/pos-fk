@@ -17,11 +17,8 @@ class UsuariosController extends Controller
 
     public function create(){
         $rol = Rol::all();
-        $cajas = Caja::all();
-
         return view('administracion.usuarios.crear', [
             'rol' => $rol,
-            'cajas' => $cajas
         ]);
     }
 
@@ -32,7 +29,6 @@ class UsuariosController extends Controller
         $usuario->user = $request->user;
         $usuario->email = $request->email;
         $usuario->id_rol = $request->id_rol;
-        $usuario->caja_id = $request->caja_id;
         $usuario->active = $request->activo;
         $usuario->password = Hash::make($request->password);
         try {
@@ -54,12 +50,10 @@ class UsuariosController extends Controller
     public function show($id){
         $usuario = User::find($id);
         $rol = Rol::all();
-        $cajas = Caja::all();
         
         return view('administracion.usuarios.editar', [
             'usuario' => $usuario,
-            'rol' => $rol,
-            'cajas' => $cajas
+            'rol' => $rol
         ]);
     }
 
@@ -68,7 +62,6 @@ class UsuariosController extends Controller
         $usuario->user = $request->user;
         $usuario->email = $request->email;
         $usuario->id_rol = $request->id_rol;
-        $usuario->caja_id = $request->caja_id;
         $usuario->active = $request->activo;
         try {
             $usuario->save();

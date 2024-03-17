@@ -13,12 +13,6 @@ class Caja extends Model
         'caja'
     ];
 
-    public function user()
-    {
-        // Uno a muchos
-        return $this->hasMany(User::class);
-    }
-
     public function detalleApertura()
     {
         // Uno a muchos

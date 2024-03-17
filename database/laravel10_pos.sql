@@ -854,7 +854,6 @@ CREATE TABLE `users` (
   `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `user` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `id_rol` bigint(20) NOT NULL,
-  `caja_id` bigint(20) unsigned NOT NULL,
   `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `active` tinyint(1) NOT NULL,
@@ -864,10 +863,8 @@ CREATE TABLE `users` (
   UNIQUE KEY `users_user_unique` (`user`),
   UNIQUE KEY `users_email_unique` (`email`),
   KEY `fk_rol_users` (`id_rol`),
-  KEY `caja_id` (`caja_id`),
-  CONSTRAINT `fk_rol_users` FOREIGN KEY (`id_rol`) REFERENCES `rol` (`id`),
-  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`caja_id`) REFERENCES `cajas` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `fk_rol_users` FOREIGN KEY (`id_rol`) REFERENCES `rol` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -876,7 +873,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (17,'Oscar Castellanos','Admin',1,1,'admin@gmail.com','$2y$10$.cu3Id5jQfkTzjElIv5xzelpxNvppCIa585OmujHAt9KR0mA9Gzfq',1,'2023-07-15 20:01:26','2023-12-10 09:15:03'),(23,'Administrador','ADM',1,1,'admin@distmultiagro.com','$2y$12$TxRVQOL.1iOYFSsUDLeEU./Z.Alv8F7ueaPxEpJ6gu5lOuolcUS9a',1,'2023-12-10 09:16:31','2023-12-10 09:16:31'),(24,'Contabilidad','Contabilidad',2,1,'conta@distmultiagro.com','$2y$12$QHyWoaolWg.fSfbk8KzvZO70eBYcIEjhrSRau.qu5wH10nQ7JulXK',1,'2023-12-10 09:17:01','2023-12-10 09:17:44'),(25,'Ventas01','Ventas01',3,1,'ventas01@distmultiagro.com','$2y$12$xuoMJezT0AOoXkZCbhKpIu/ra6naGlsIwBEy/4tAXXJ6co80nIYGO',1,'2023-12-10 09:17:33','2023-12-10 09:17:53'),(26,'USUARIO NUEVO','USER',1,2,'prueba@gmail.com','$2y$12$OajyDmTgi3fTOD/Pi.mYUusloecW8jPW0sonc7RzL4UbXmpoBcLaa',1,'2024-03-12 21:53:50','2024-03-12 21:58:51'),(27,'Oscar','Oscar',3,3,'castellanos@gmail.com','$2y$12$OMN/PCsogK1BWrZCdeSYieF6I7F25vyME6ZjgYEf/7bqjX.J1WE6O',1,'2024-03-13 14:48:37','2024-03-13 14:48:37');
+INSERT INTO `users` VALUES (17,'Oscar Castellanos','Admin',1,'admin@gmail.com','$2y$10$.cu3Id5jQfkTzjElIv5xzelpxNvppCIa585OmujHAt9KR0mA9Gzfq',1,'2023-07-15 20:01:26','2023-12-10 09:15:03'),(23,'Administrador','ADM',1,'admin@distmultiagro.com','$2y$12$TxRVQOL.1iOYFSsUDLeEU./Z.Alv8F7ueaPxEpJ6gu5lOuolcUS9a',1,'2023-12-10 09:16:31','2023-12-10 09:16:31'),(24,'Contabilidad','Contabilidad',2,'conta@distmultiagro.com','$2y$12$QHyWoaolWg.fSfbk8KzvZO70eBYcIEjhrSRau.qu5wH10nQ7JulXK',1,'2023-12-10 09:17:01','2023-12-10 09:17:44'),(25,'Ventas01','Ventas01',3,'ventas01@distmultiagro.com','$2y$12$xuoMJezT0AOoXkZCbhKpIu/ra6naGlsIwBEy/4tAXXJ6co80nIYGO',1,'2023-12-10 09:17:33','2023-12-10 09:17:53'),(26,'USUARIO NUEVO','USER',1,'prueba@gmail.com','$2y$12$OajyDmTgi3fTOD/Pi.mYUusloecW8jPW0sonc7RzL4UbXmpoBcLaa',1,'2024-03-12 21:53:50','2024-03-12 21:58:51'),(27,'Oscar','Oscar',3,'castellanos@gmail.com','$2y$12$OMN/PCsogK1BWrZCdeSYieF6I7F25vyME6ZjgYEf/7bqjX.J1WE6O',1,'2024-03-13 14:48:37','2024-03-13 14:48:37'),(29,'prueba02','pru',1,'pru@gmail.com','$2y$12$w.H33yDoHye8SbTkfQLWXuPz58X1S3poUtK/kflfPymTxs4t8ZZI6',1,'2024-03-17 02:04:38','2024-03-17 02:04:38');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -932,4 +929,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-03-16 17:03:31
+-- Dump completed on 2024-03-16 20:05:36

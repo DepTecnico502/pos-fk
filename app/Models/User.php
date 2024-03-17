@@ -22,19 +22,12 @@ class User extends Authenticatable
         'user',
         'email',
         'id_rol',
-        'caja_id',
         'password',
         'active',
     ];
 
     public function Rol(){
         return $this->hasOne(Rol::class, 'id', 'id_rol');
-    }
-
-    public function caja()
-    {
-        // Uno a Uno
-        return $this->belongsTo(Caja::class);
     }
 
     /**
