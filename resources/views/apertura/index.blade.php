@@ -50,7 +50,7 @@
                 <tbody>
                     @foreach ($apertura as $u)
                         <tr>
-                            <td>{{ $u->fecha_apertura }}</td>
+                            <td>{{ $u->created_at }}</td>
                             <td>{{ $u->caja->caja }}</td>
                             <td>
                                 Q {{ $u->saldo_inicial }}

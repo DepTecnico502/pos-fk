@@ -17,7 +17,8 @@
             <table id="example" class="table table-hover table-borderless" cellspacing="0" width="100%">
                 <thead class="table-dark">
                     <tr>
-                        <td>Descripcion</td>
+                        <td>Fecha registro</td>
+                        <td>Descripción</td>
                         <td>Saldo</td>
                         <td>Entrada</td>
                         <td>Salida</td>
@@ -28,6 +29,8 @@
                 <tbody>
                     @foreach ($detalleApertura as $u)
                         <tr>
+                            <td>
+                                {{ $u->created_at }}
                             <td>
                                 {{ $u->descripcion }}
                             </td>

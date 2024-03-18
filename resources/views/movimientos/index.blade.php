@@ -49,7 +49,7 @@
                                     {{-- ver factura --}}
                                     <i class="fa-solid fa-arrow-right"></i>
                                 </a>
-                                {{ $u->saldo_total }}
+                                Q.{{ $u->saldo_total }}
                             </td>
                         </tr>
                     @endforeach

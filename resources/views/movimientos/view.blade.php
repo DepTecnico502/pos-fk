@@ -27,7 +27,7 @@
                     <tr>
                         <td>Caja</td>
                         <td>Saldo total</td>
-                        <td>Descripcion</td>
+                        <td>Descripción</td>
                         <td>Entrada</td>
                         <td>Salida</td>
                         <td>Ventas</td>
@@ -38,7 +38,7 @@
                     @foreach ($detalleApertura as $u)
                         <tr>
                             <td>{{ $u->caja->caja }}</td>
-                            <td>{{ $u->saldo_total }}</td>
+                            <td>Q.{{ $u->saldo_total }}</td>
                             <td>
                                 {{ $u->descripcion }}
                             </td>

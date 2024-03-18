@@ -58,7 +58,7 @@ class HistorialPagoscxcController extends Controller
 
             $DetalleApertura->descripcion = 'Pago para la factura: #'.$cxc->venta->documento;
             $DetalleApertura->apertura_cajas_id = $apertura->apertura_cajas_id;
-            $DetalleApertura->venta_id = $cxc->venta_id;
+            $DetalleApertura->ingreso = $request->monto_abonado;
             $DetalleApertura->saldo_total = ($apertura->saldo_total + $request->monto_abonado);
             $DetalleApertura->caja_id = $request->caja_id;
             $DetalleApertura->save();

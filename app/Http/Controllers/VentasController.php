@@ -174,15 +174,15 @@ class VentasController extends Controller
                     $historial_cxc->save();
 
                     // REGISTRAR MOVIMIENTO CUANDO SE DEJA UN ANTICIPO
-                    $ventaId = Ventas::max('id');
+                    // $ventaId = Ventas::max('id');
                     $DetalleApertura = new DetalleAperturaCaja();
                     $apertura = DetalleAperturaCaja::where('caja_id', $request->caja_id)->latest()->first();
         
                     $DetalleApertura->descripcion = 'Anticipo para la factura: #'.$request->numero_documento;
                     $DetalleApertura->apertura_cajas_id = $apertura->apertura_cajas_id;
-                    $DetalleApertura->venta_id = $ventaId;
+                    $DetalleApertura->ingreso = $request->anticipo;
                     // Validar cuando se deja un anticipo para guardar el movimiento como "Anticipo"
-                    $DetalleApertura->saldo_total = ($apertura->saldo_total + $request->monto_total);
+                    $DetalleApertura->saldo_total = ($apertura->saldo_total + $request->anticipo);
                     $DetalleApertura->caja_id = $request->caja_id;
                     $DetalleApertura->save();
                 }
