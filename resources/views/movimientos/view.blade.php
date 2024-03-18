@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Apertura')
+@section('title', 'Detalle de saldos')
 
 @section('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css">
@@ -8,17 +8,26 @@
 @endsection
 
 @section('page-link')
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Apertura/</span> movimientos</h4>
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Detalle de saldos/</span></h4>
 @endsection
 
 @section('content')
+    <div class="container">
+        @if(session('error'))
+            <div class="alert {{ session('tipo') }} alert-dismissible show fade">
+                <strong>{{session('error')}}</strong> {{session('mensaje')}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+    </div>
     <div class="card">
         <div class="card-body">
             <table id="example" class="table table-hover table-borderless" cellspacing="0" width="100%">
                 <thead class="table-dark">
                     <tr>
+                        <td>Caja</td>
+                        <td>Saldo total</td>
                         <td>Descripcion</td>
-                        <td>Saldo</td>
                         <td>Entrada</td>
                         <td>Salida</td>
                         <td>Ventas</td>
@@ -28,11 +37,10 @@
                 <tbody>
                     @foreach ($detalleApertura as $u)
                         <tr>
+                            <td>{{ $u->caja->caja }}</td>
+                            <td>{{ $u->saldo_total }}</td>
                             <td>
                                 {{ $u->descripcion }}
-                            </td>
-                            <td>
-                                {{$u->saldo_total}}
                             </td>
                             <td>{{ $u->ingreso }}</td>
                             <td> @if ($u->egreso !=null)

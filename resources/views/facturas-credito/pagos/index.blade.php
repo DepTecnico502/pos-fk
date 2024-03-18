@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Facturas al crédito')
+@section('title', 'Pagos')
 
 @section('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css">
@@ -14,7 +14,7 @@
 @endsection
 
 @section('page-link')
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Facturas al crédito/</span></h4>
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Facturas/</span>pagos</h4>
 @endsection
 
 @section('content')
@@ -35,11 +35,11 @@
                     <div class="row g-3">
                         <div class="col">
                             <strong>Desde</strong>
-                            <input class="form-control" type="text" id="min" name="min" placeholder="yyyy-mm-dd" value="">
+                            <input class="form-control" type="text" id="min" name="min" placeholder="yyyy-mm-dd" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
                         </div>
                         <div class="col">
                             <strong>Hasta</strong>
-                            <input class="form-control" type="text" id="max" name="max" placeholder="yyyy-mm-dd" value="">
+                            <input class="form-control" type="text" id="max" name="max" placeholder="yyyy-mm-dd" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
                         </div>
                     </div>
                 </div>
@@ -47,79 +47,29 @@
             <table id="example" class="table table-hover table-borderless" cellspacing="0" width="100%">
                 <thead class="table-dark">
                     <tr>
-                        <td>Fecha emitida</td>
-                        <td>Venta</td>
+                        <td>Fecha abono</td>
                         <td>Cliente</td>
-                        <td>Días de crédito</td>
-                        <td>Fecha a pagar</td>
-                        <td>Días vencidos</td>
-                        <td>Monto Total</td>
-                        <td>Saldo pendiente</td>
-                        <td>Estado</td>
-                        <td>Acciones</td>
+                        <td>Factura</td>
+                        <td>Monto abonado</td>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($facturas as $factura)
+                    @foreach ($pagos as $pago)
                         <tr>
-                            <td>{{ date('Y-m-d', strtotime($factura->created_at)) }}</td>
-                            <td>{{ $factura->venta->TipoDocumento->tipo_documento }}: {{ $factura->venta->documento }}</td>
-                            <td>{{ $factura->cliente->nombre }} ({{ $factura->cliente->rut }})</td>
-                            <td>{{ $factura->dias_credito }}</td>
-                            <td>{{ date('Y-m-d', strtotime($factura->fecha_pagar)) }}</td>
+                            <td>{{ date('Y-m-d', strtotime($pago->created_at)) }}</td>
+                            <td>{{ $pago->cxc->cliente->nombre }}</td>
                             <td>
-                                @php
-                                    $fechaActual = \Carbon\Carbon::now();
-                                    $fechaAPagar = \Carbon\Carbon::parse($factura->fecha_pagar);
-                                    $diferenciaEnDias = $fechaActual->diffInDays($fechaAPagar);
-                                    if ($fechaActual->gt($fechaAPagar)) {
-                                        $diferenciaEnDias *= -1; // Convertimos los días en negativo si la fecha a pagar ya ha pasado
-                                    }
-                                @endphp
-                                @if ($diferenciaEnDias > 0)
-                                    <span class="badge bg-success">{{ $diferenciaEnDias }} días</span>
-                                @else
-                                    <span class="badge bg-danger">{{ $diferenciaEnDias }} días</span>
-                                @endif
+                                {{ $pago->cxc->venta->TipoDocumento->tipo_documento }}: #{{ $pago->cxc->venta->documento }}
+                                <a type="button" class="btn btn-sm btn-warning"
+                                    href="{{ route('ventas.show', $pago->cxc->venta_id) }}">
+                                    {{-- ver factura --}}
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </a>
                             </td>
-                            <td>Q.{{ $factura->monto_total }}</td>
-                            <td>Q.{{ $factura->saldo_pendiente }}</td>
-                            <td>
-                                {{ $factura->estado }}
-                                {{-- <a type="button" class="btn btn-sm btn-warning"
-                                    href="{{ route('ventas.show', $factura->id) }}"> --}}
-                                    {{-- ver historial de pagos --}}
-                                    {{-- <i class="fa-solid fa-arrow-right"></i>
-                                </a> --}}
-                            </td>
-                            <td>
-                                <div class="btn-group">
-                                    <a type="button" class="btn btn-success"
-                                        href="{{ route('ventas.show', $factura->venta_id) }}">
-                                        {{-- ver --}}
-                                        <i class="fa-solid fa-eye"></i>
-                                    </a>
-                                    <a 
-                                        class="btn btn-primary"
-                                        target="_blank"
-                                        type="button"
-                                        href="{{ route('ticket.venta', $factura->venta_id) }}">
-                                        {{-- Ticket --}}
-                                        <i class="fa-solid fa-print"></i>
-                                    </a>
-                                    {{-- Validar si la cuenta ya fue pagada si es asi, deshabilitar el boton --}}
-                                    <a 
-                                        class="{{ $factura->estado != 'Factura anulada' ? 'btn btn-danger' : 'btn btn-danger disabled' }}"
-                                        type="button"
-                                        href="{{ route('facturas.pago.create', $factura->id) }}">
-                                        {{-- Pagar --}}
-                                        <i class="fa-solid fa-dollar-sign"></i>
-                                    </a>
-                                </div>
-                            </td>
+                            <td>Q.{{ $pago->monto_abonado }}</td>
                         </tr>
                         {{-- Modal --}}
-                        <div class="modal fade" id="modal-anular-{{ $factura->id }}" tabindex="-1" role="document"
+                        <div class="modal fade" id="modal-anular-{{ $pago->id }}" tabindex="-1" role="document"
                             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
                                 <div class="modal-content">
@@ -134,7 +84,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                                        <a href="{{ route('venta.anular', $factura->id) }}" class="btn btn-primary ml-1">
+                                        <a href="{{ route('venta.anular', $pago->id) }}" class="btn btn-primary ml-1">
                                             <i class="bx bx-check d-block d-sm-none"></i>
                                             <span class="d-none d-sm-block">Anular Factura</span>
                                         </a>
@@ -194,7 +144,7 @@
 
             var table = $("#example").DataTable({
                 order: [
-                    [1, "desc"]
+                    [2, "desc"]
                 ],
 
                 language: {

@@ -32,4 +32,9 @@ class CuentaxCobrar extends Model
         // Uno a Uno
         return $this->belongsTo(Cliente::class);
     }
+
+    public function historialcxc()
+    {
+        return $this->hasMany(HistorialCXC::class);
+    }
 }

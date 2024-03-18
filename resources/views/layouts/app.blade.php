@@ -92,6 +92,8 @@
                     <li class="menu-item 
                         {{ request()->routeIs([
                                 'facturas.credito.index',
+                                'facturas.pagos.index',
+                                'facturas.pago.create'
                             ]) ? 'active open' : ''
                         }}
                     ">
@@ -104,6 +106,7 @@
                             <li class="menu-item 
                                 {{ request()->routeIs([
                                         'facturas.credito.index',
+                                        'facturas.pago.create'
                                     ]) ? 'active' : ''
                                 }}
                             ">
@@ -113,14 +116,12 @@
                             </li>
                             <li class="menu-item 
                                 {{ request()->routeIs([
-                                        'configuracion.mediosdepago.index',
-                                        'configuracion.mediosdepago.create',
-                                        'configuracion.mediosdepago.editar'
+                                        'facturas.pagos.index',
                                     ]) ? 'active' : ''
                                 }}
                             ">
-                                <a href="{{ route('configuracion.mediosdepago.index') }}" class="menu-link">
-                                    <div data-i18n="Pagos">Pagos</div>
+                                <a href="{{ route('facturas.pagos.index') }}" class="menu-link">
+                                    <div data-i18n="Pagos">Historial de pagos</div>
                                 </a>
                             </li>
                         </ul>
@@ -259,7 +260,8 @@
                                 'movimientos.create',
                                 'cajas.index',
                                 'caja.editar',
-                                'caja.crear'
+                                'caja.crear',
+                                'movimientos.show'
                             ]) ? 'active open' : ''
                         }}
                     ">
@@ -285,7 +287,8 @@
                             <li class="menu-item
                                 {{ request()->routeIs([
                                         'movimientos.index', 
-                                        'movimientos.create'
+                                        'movimientos.create',
+                                        'movimientos.show'
                                     ]) ? 'active' : ''
                                 }}
                             ">
@@ -331,7 +334,7 @@
                                 }}
                             ">
                                 <a href="{{ route('reporte.ventas.index') }}" class="menu-link">
-                                    <div data-i18n="Reporte de ventas">Reporte de ventas</div>
+                                    <div data-i18n="Reporte de ventas">Reporte de ventas por producto</div>
                                 </a>
                             </li>
                             

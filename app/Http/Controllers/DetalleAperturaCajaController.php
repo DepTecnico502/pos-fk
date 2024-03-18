@@ -14,30 +14,23 @@ class DetalleAperturaCajaController extends Controller
 {
     public function index()
     {
-        // Consulta para solo mostrar las cajas aperturadas
-        $aperturas = AperturaCaja::where('estado', 'ABIERTO')->get();
-
-        // Obtener solo los IDs de las cajas aperturadas
-        $cajasAperturadasIds = $aperturas->pluck('id');
-
-        // Consulta para obtener los detalles de apertura de cajas para las cajas aperturadas
-        $detalleApertura = DetalleAperturaCaja::whereIn('apertura_cajas_id', $cajasAperturadasIds)
-        ->whereIn('id', function ($query) {
-            $query->select(DB::raw('MAX(id)'))
-                ->from('detalle_apertura_cajas')
-                ->groupBy('apertura_cajas_id');
+        $ultimos_saldos = DetalleAperturaCaja::select('detalle_apertura_cajas.caja_id', 'cajas.caja AS nombre_caja', 'detalle_apertura_cajas.descripcion', 'detalle_apertura_cajas.saldo_total', 'apertura_cajas.id AS apertura_caja')
+        ->join(DB::raw('(SELECT caja_id, MAX(created_at) AS max_created_at
+                        FROM detalle_apertura_cajas
+                        GROUP BY caja_id) AS max_dates'), function($join) {
+            $join->on('detalle_apertura_cajas.caja_id', '=', 'max_dates.caja_id');
+            $join->on('detalle_apertura_cajas.created_at', '=', 'max_dates.max_created_at');
         })
+        ->join('apertura_cajas', 'detalle_apertura_cajas.caja_id', '=', 'apertura_cajas.caja_id')
+        ->join('cajas', 'detalle_apertura_cajas.caja_id', '=', 'cajas.id')
+        ->where('apertura_cajas.estado', 'ABIERTO')
         ->get();
 
-        // dd($detalleApertura);
         return view('movimientos.index', [
-            'detalleApertura' => $detalleApertura,
+            'ultimos_saldos' => $ultimos_saldos,
         ]);
     }
 
-    // $detalleApertura = DetalleAperturaCaja::whereHas('Apertura', function ($query) {
-    //     $query->where('estado', 'ABIERTO');
-    // })->get();
     public function create()
     {   
         // Consulta para solo mostrar las cajas aperturadas
@@ -87,5 +80,14 @@ class DetalleAperturaCajaController extends Controller
                 'tipo' => 'alert-success'
             ]);
         }
+    }
+
+    public function show($id)
+    {
+        $detalleApertura = DetalleAperturaCaja::where('apertura_cajas_id', $id)->get();
+
+        return view('movimientos.view', [
+            'detalleApertura' => $detalleApertura
+        ]);
     }
 }

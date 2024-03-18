@@ -9,6 +9,7 @@ use App\Http\Controllers\ClientesController;
 use App\Http\Controllers\CuentaXCobrarController;
 use App\Http\Controllers\DetalleAperturaCajaController;
 use App\Http\Controllers\ExportExcelController;
+use App\Http\Controllers\HistorialPagoscxcController;
 use App\Http\Controllers\mediosdepagoController;
 use App\Http\Controllers\PagosController;
 use App\Http\Controllers\PdfController;
@@ -119,6 +120,7 @@ Route::post('apertura/finalizar', [AperturaCajaController::class, 'store'])->mid
 
 //MOVIMIENTOS DE CAJA
 Route::get('movimientos', [DetalleAperturaCajaController::class, 'index'])->middleware('auth')->name('movimientos.index');
+Route::get('movimientos/detalle/{id}', [DetalleAperturaCajaController::class, 'show'])->middleware('auth')->name('movimientos.show');
 Route::get('movimientos/agregar', [DetalleAperturaCajaController::class, 'create'])->middleware('auth')->name('movimientos.create');
 Route::post('movimientos/finalizar', [DetalleAperturaCajaController::class, 'store'])->middleware('auth')->name('movimientos.store');
 
@@ -163,6 +165,13 @@ Route::post('/configuracion/series/crear', [SerieController::class, 'store'])->m
 
 // Facturas al credito
 Route::get('/facturas-credito', [CuentaXCobrarController::class, 'index'])->middleware('auth.conta')->name('facturas.credito.index');
+
+// pagos facturas al credito
+Route::get('/facturas-credito/{cxc}/pago', [HistorialPagoscxcController::class, 'create'])->middleware('auth.conta')->name('facturas.pago.create');
+Route::post('/facturas-credito/pago/store', [HistorialPagoscxcController::class, 'store'])->middleware('auth.conta')->name('facturas.pago.store');
+
+// Historial de pagos de cxc
+Route::get('/pagos-cxc', [HistorialPagoscxcController::class, 'index'])->middleware('auth.conta')->name('facturas.pagos.index');
 
 //ERROR 403
 Route::get('/denied', function () {

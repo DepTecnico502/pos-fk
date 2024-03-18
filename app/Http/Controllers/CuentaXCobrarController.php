@@ -9,7 +9,7 @@ class CuentaXCobrarController extends Controller
 {
     public function index()
     {
-        $facturas = CuentaxCobrar::all();
+        $facturas = CuentaxCobrar::where('estado', '!=', 'Cuenta pagada')->get();
 
         return view('facturas-credito.index', [
             'facturas' => $facturas

@@ -43,23 +43,12 @@ class RecepcionesController extends Controller
 
     public function create()
     {
-        $detalleId = AperturaCaja::max('id');
-        if ($detalleId != null) $apertura = AperturaCaja::findOrFail($detalleId);
+        $proveedores = Proveedor::all();
+        $articulos = Articulo::all();
+        $idsBusqueda = [33, 39, 41, 99];
+        $tipo_documento = tipo_documento::whereIn('id', $idsBusqueda)->get();
 
-        if ($detalleId == null || $apertura->estado == 'CERRADO') {
-            return redirect()->route('recepciones.index')->with([
-                'error' => 'Error',
-                'mensaje' => 'Se debe de aperturar una caja.',
-                'tipo' => 'alert-danger'
-            ]);
-        } else {
-            $proveedores = Proveedor::all();
-            $articulos = Articulo::all();
-            $idsBusqueda = [33, 39, 41, 99];
-            $tipo_documento = tipo_documento::whereIn('id', $idsBusqueda)->get();
-
-            return view('recepciones.create', compact('proveedores', 'articulos', 'tipo_documento'));
-        }
+        return view('recepciones.create', compact('proveedores', 'articulos', 'tipo_documento'));
     }
 
     public function addArticulo(Request $request)

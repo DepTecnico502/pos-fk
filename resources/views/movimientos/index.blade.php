@@ -35,39 +35,21 @@
                     <tr>
                         <td>Caja</td>
                         <td>Saldo total</td>
-                        <td>Descripcion</td>
-                        <td>Saldo</td>
-                        <td>Entrada</td>
-                        <td>Salida</td>
-                        <td>Ventas</td>
-                        <td>Compras</td>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($detalleApertura as $u)
+                    @foreach ($ultimos_saldos as $u)
                         <tr>
-                            <td>{{ $u->caja->caja }}</td>
-                            <td>{{ $u->saldo_total }}</td>
                             <td>
-                                {{ $u->descripcion }}
+                                {{ $u->nombre_caja }}
                             </td>
                             <td>
-                                {{$u->saldo_total}}
-                            </td>
-                            <td>{{ $u->ingreso }}</td>
-                            <td> @if ($u->egreso !=null)
-                                -{{ $u->egreso }}
-                                @endif
-                            </td>
-                            <td>
-                                @if ($u->venta_id != null)
-                                {{$u->Venta->monto_total}} 
-                                @endif
-                            </td>
-                            <td>
-                                @if ($u->recepciones_id != null)
-                                    -{{$u->recepcion->monto_total}} 
-                                @endif
+                                <a type="button" class="btn btn-sm btn-warning"
+                                    href="{{ route('movimientos.show', $u->apertura_caja) }}">
+                                    {{-- ver factura --}}
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                                {{ $u->saldo_total }}
                             </td>
                         </tr>
                     @endforeach

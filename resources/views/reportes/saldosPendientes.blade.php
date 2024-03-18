@@ -24,11 +24,12 @@
                         <div class="row g-3">
                             <div class="col">
                                 <strong>Desde</strong>
-                                <input class="form-control" type="text" id="fecha_desde" name="fecha_desde" placeholder="yyyy-mm-dd" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                <input class="form-control" type="text" id="fecha_desde" name="fecha_desde" placeholder="yyyy-mm-dd">
+                                {{-- <input class="form-control" type="text" id="fecha_desde" name="fecha_desde" placeholder="yyyy-mm-dd" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"> --}}
                             </div>
                             <div class="col">
                                 <strong>Hasta</strong>
-                                <input class="form-control" type="text" id="fecha_hasta" name="fecha_hasta" placeholder="yyyy-mm-dd" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                <input class="form-control" type="text" id="fecha_hasta" name="fecha_hasta" placeholder="yyyy-mm-dd">
                             </div>
                         </div>
                     </div>
@@ -52,20 +53,23 @@
                     @foreach ($saldosPendientes as $sp)
                         <tr>
                             <td>{{ date('Y-m-d', strtotime($sp->fecha_recepcion)) }}</td>
-                            <td>{{ $sp->proveedor->nombre }}</td> 
-                            <td>{{ $sp->dias_credito }}</td> 
-                            <td>{{ $sp->fecha_a_pagar }}</td> 
+                            <td>{{ $sp->proveedor->nombre }}</td>
+                            <td>{{ $sp->dias_credito }}</td>
+                            <td>{{ $sp->fecha_a_pagar }}</td>
                             <td>
                                 @php
                                     $fechaActual = \Carbon\Carbon::now();
                                     $fechaAPagar = \Carbon\Carbon::parse($sp->fecha_a_pagar);
                                     $diferenciaEnDias = $fechaActual->diffInDays($fechaAPagar);
+                                    if ($fechaActual->gt($fechaAPagar)) {
+                                        $diferenciaEnDias *= -1; // Convertimos los días en negativo si la fecha a pagar ya ha pasado
+                                    }
                                 @endphp
                                 @if ($diferenciaEnDias > 0)
                                     <span class="badge bg-success">{{ $diferenciaEnDias }} días</span>
                                 @else
                                     <span class="badge bg-danger">{{ $diferenciaEnDias }} días</span>
-                                @endif  
+                                @endif
                             </td>
                             <td>{{ $sp->monto_total }}</td>
                             <td>{{ $sp->saldo_pendiente }}</td>
@@ -91,14 +95,14 @@
 
     <script>
         var minDate, maxDate;
-		
+
         $.fn.dataTable.ext.search.push(
             function( settings, data, dataIndex ) {
                 var min = minDate.val();
                 var max = maxDate.val();
                 // Cambiar data[num] para filtrar fecha
                 var date = new Date( data[3] );
-                
+
                 if (
                     ( min === null && max === null ) ||
                     ( min === null && date <= max ) ||

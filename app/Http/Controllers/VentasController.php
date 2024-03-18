@@ -164,6 +164,7 @@ class VentasController extends Controller
                 }else{
                     $cuenta_x_cobrar->saldo_pendiente = $request->monto_total;
                 }
+                $cuenta_x_cobrar->estado = 'Cuenta abonada';
                 $cuenta_x_cobrar->save();
 
                 if($request->anticipo){

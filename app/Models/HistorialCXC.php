@@ -15,4 +15,9 @@ class HistorialCXC extends Model
         'cxc_id',
         'monto_abonado'
     ];
+
+    public function cxc()
+    {
+        return $this->belongsTo(CuentaxCobrar::class);
+    }
 }
