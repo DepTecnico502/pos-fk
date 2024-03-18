@@ -35,8 +35,8 @@ class TicketController extends Controller
 
         $this->pdf->SetFont('Arial','',9);
         $this->pdf->MultiCell(0,5,iconv("UTF-8", "ISO-8859-1","Ave. Ismael Arriaza zona 3, Sanarate, El Progreso"),0,'C',false);
-        $this->pdf->MultiCell(0,5,iconv("UTF-8", "ISO-8859-1","Teléfono: (502) 5017 2353 / (502) 7796-7928"),0,'C',false);
-        $this->pdf->MultiCell(0,5,iconv("UTF-8", "ISO-8859-1","Email: imagenyproduccionesfk@gmail.com"),0,'C',false);
+        // $this->pdf->MultiCell(0,5,iconv("UTF-8", "ISO-8859-1","Teléfono: (502) 5017 2353 / (502) 7796-7928"),0,'C',false);
+        // $this->pdf->MultiCell(0,5,iconv("UTF-8", "ISO-8859-1","Email: imagenyproduccionesfk@gmail.com"),0,'C',false);
 
         $this->pdf->Ln(1);
         $this->pdf->Cell(0,5,iconv("UTF-8", "ISO-8859-1","------------------------------------------------------"),0,0,'C');

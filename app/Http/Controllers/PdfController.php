@@ -38,9 +38,9 @@ class PdfController extends Controller
 
         $this->pdf->Cell(182,9,iconv("UTF-8", "ISO-8859-1","Ave. Ismael Arriaza zona 3, Sanarate, El Progreso"),0,0,'C');
         $this->pdf->Ln(5);
-        $this->pdf->Cell(182,9,iconv("UTF-8", "ISO-8859-1","(502) 5017 2353 / (502) 7796-7928"),0,0,'C');
-        $this->pdf->Ln(5);
-        $this->pdf->Cell(182,9,iconv("UTF-8", "ISO-8859-1","imagenyproduccionesfk@gmail.com"),0,0,'C');
+        // $this->pdf->Cell(182,9,iconv("UTF-8", "ISO-8859-1","(502) 5017 2353 / (502) 7796-7928"),0,0,'C');
+        // $this->pdf->Ln(5);
+        // $this->pdf->Cell(182,9,iconv("UTF-8", "ISO-8859-1","imagenyproduccionesfk@gmail.com"),0,0,'C');
 
         $this->pdf->Ln(13);
 
